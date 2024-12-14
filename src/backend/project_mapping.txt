@@ -1,0 +1,1 @@
+NzbDrone.Common -> Radarr.Common\nNzbDrone.Core -> Radarr.Core\nNzbDrone.Host -> Radarr.Host\nNzbDrone.Http -> Radarr.Http\nNzbDrone.Mono -> Radarr.Mono\nNzbDrone.SignalR -> Radarr.SignalR\nNzbDrone.Test.Common -> Radarr.Test.Common\nNzbDrone.Windows -> Radarr.Windows\nNzbDrone.Api.V3 -> Radarr.Api.V3
