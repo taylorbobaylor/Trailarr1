@@ -1,17 +1,40 @@
 using System.IO;
 using Microsoft.Extensions.Logging;
+using Trailarr.Core.Models;
 using YoutubeExplode;
-using YoutubeExplode.Videos.Streams;
+using YoutubeExplode.Converter;
 
 namespace Trailarr.Core.Services;
 
-public class TrailerService(ITmdbService tmdbService, ILogger<TrailerService> logger) : ITrailerService
+public interface IYoutubeClient
 {
-    private readonly ITmdbService _tmdbService = tmdbService;
-    private readonly ILogger<TrailerService> _logger = logger;
-    private readonly YoutubeClient _youtube = new();
+    Task DownloadAsync(string url, string outputPath, Action<ConversionRequestBuilder> configure, CancellationToken cancellationToken = default);
+}
 
-    public async Task<bool> DownloadTrailerAsync(Models.Movie movie, CancellationToken token = default)
+public class YoutubeClientWrapper : IYoutubeClient
+{
+    private readonly YoutubeClient _client = new();
+
+    public async Task DownloadAsync(string url, string outputPath, Action<ConversionRequestBuilder> configure, CancellationToken cancellationToken = default)
+    {
+        await _client.Videos.DownloadAsync(url, outputPath, configure, cancellationToken);
+    }
+}
+
+public class TrailerService : ITrailerService
+{
+    private readonly ITmdbService _tmdbService;
+    private readonly ILogger<TrailerService> _logger;
+    private readonly IYoutubeClient _youtube;
+
+    public TrailerService(ITmdbService tmdbService, ILogger<TrailerService> logger, IYoutubeClient? youtube = null)
+    {
+        _tmdbService = tmdbService;
+        _logger = logger;
+        _youtube = youtube ?? new YoutubeClientWrapper();
+    }
+
+    public async Task<bool> DownloadTrailerAsync(Movie movie, CancellationToken token = default)
     {
         try
         {
@@ -36,18 +59,13 @@ public class TrailerService(ITmdbService tmdbService, ILogger<TrailerService> lo
                 return true;
             }
 
-            var streamManifest = await _youtube.Videos.Streams.GetManifestAsync(trailerUrl, token);
-            var streamInfo = streamManifest.GetMuxedStreams()
-                .OrderByDescending(s => s.VideoQuality)
-                .FirstOrDefault();
+            await _youtube.DownloadAsync(trailerUrl, trailerPath,
+                builder => builder
+                    .SetPreset(ConversionPreset.UltraFast)
+                    .SetContainer("mp4")
+                    .SetFFmpegPath("ffmpeg"),
+                token);
 
-            if (streamInfo == null)
-            {
-                _logger.LogWarning("No suitable video stream found for movie trailer: {Title}", movie.Title);
-                return false;
-            }
-
-            await _youtube.Videos.Streams.DownloadAsync(streamInfo, trailerPath, cancellationToken: token);
             movie.TrailerPath = trailerPath;
             _logger.LogInformation("Successfully downloaded trailer for movie: {Title}", movie.Title);
             return true;
@@ -59,13 +77,13 @@ public class TrailerService(ITmdbService tmdbService, ILogger<TrailerService> lo
         }
     }
 
-    public Task<bool> HasTrailerAsync(Models.Movie movie)
+    public Task<bool> HasTrailerAsync(Movie movie)
     {
         var trailerPath = Path.ChangeExtension(movie.FilePath, null) + "-trailer.mp4";
         return Task.FromResult(File.Exists(trailerPath));
     }
 
-    public async Task DownloadMissingTrailersAsync(IEnumerable<Models.Movie> movies, CancellationToken token = default)
+    public async Task DownloadMissingTrailersAsync(IEnumerable<Movie> movies, CancellationToken token = default)
     {
         foreach (var movie in movies)
         {
