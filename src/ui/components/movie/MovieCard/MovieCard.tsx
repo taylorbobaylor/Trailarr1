@@ -1,0 +1,1 @@
+export interface MovieCardProps { movie: { id: number; title: string; year: number; posterPath?: string; trailerUrl?: string; }; } export default function MovieCard({ movie }: MovieCardProps) { return <div>MovieCard</div>; }

@@ -1,0 +1,1 @@
+export interface PageHeaderProps { onSidebarToggle: () => void; isSmallScreen: boolean; } export default function PageHeader({ onSidebarToggle, isSmallScreen }: PageHeaderProps) { return <div>PageHeader</div>; }

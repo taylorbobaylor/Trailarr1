@@ -1,0 +1,1 @@
+export interface MovieGridProps { movies: Array<{ id: number; title: string; year: number; posterPath?: string; trailerUrl?: string; }>; } export default function MovieGrid({ movies }: MovieGridProps) { return <div>MovieGrid</div>; }
