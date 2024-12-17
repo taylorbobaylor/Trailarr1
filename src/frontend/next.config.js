@@ -2,6 +2,7 @@
 const nextConfig = {
   output: 'export',
   distDir: 'dist',
+  trailingSlash: true,
   images: {
     unoptimized: true,
     domains: ['image.tmdb.org'],
@@ -15,6 +16,9 @@ const nextConfig = {
   },
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+  },
+  experimental: {
+    optimizePackageImports: ['@/components']
   }
 }
 
