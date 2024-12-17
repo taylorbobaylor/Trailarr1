@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  trailarr:
+    build:
+      context: .
+      dockerfile: src/docker/Dockerfile
+    container_name: trailarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - DOTNET_ENVIRONMENT=Production
+      - NODE_ENV=production
+      - TMDB_API_KEY=${TMDB_API_KEY:-}
+    volumes:
+      - ./config:/config
+      - ${MOVIES_PATH:-./movies}:/movies
+    ports:
+      - "3000:3000"  # Frontend
+      - "5000:5000"  # Backend API
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

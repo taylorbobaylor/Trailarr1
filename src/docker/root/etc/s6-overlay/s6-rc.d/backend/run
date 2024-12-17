@@ -1,0 +1,4 @@
+#!/command/with-contenv bash
+
+cd /app/backend
+exec s6-setuidgid abc dotnet Trailarr.Core.dll

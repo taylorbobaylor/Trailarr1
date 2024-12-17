@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Node
+**/node_modules
+**/npm-debug.log
+**/dist
+**/.next
+**/.turbo
+**/.cache
+
+# .NET
+**/bin
+**/obj
+**/*.user
+**/*.suo
+**/*.userosscache
+**/*.sln.docstates
+
+# IDE
+.vs
+.idea
+*.swp
+*.swo
+.DS_Store
+
+# Docker
+.docker
+
+# Tests
+**/coverage
+**/*.Tests
+**/*.Test
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+
+# Misc
+README.md
+LICENSE
+*.md

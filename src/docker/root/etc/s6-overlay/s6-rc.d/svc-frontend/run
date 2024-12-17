@@ -1,0 +1,4 @@
+#!/command/with-contenv bash
+exec s6-notifyoncheck -d -n 300 -w 1000 \
+    s6-setuidgid abc \
+    cd /app/frontend && node server.js

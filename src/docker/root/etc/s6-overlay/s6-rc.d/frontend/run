@@ -1,0 +1,4 @@
+#!/command/with-contenv bash
+
+cd /app/frontend
+exec s6-setuidgid abc npx serve -s . -l 3000

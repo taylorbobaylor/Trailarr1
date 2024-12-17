@@ -1,25 +1,7 @@
-using System.IO;
 using Microsoft.Extensions.Logging;
 using Trailarr.Core.Models;
-using YoutubeExplode;
-using YoutubeExplode.Converter;
 
 namespace Trailarr.Core.Services;
-
-public interface IYoutubeClient
-{
-    Task DownloadAsync(string url, string outputPath, Action<ConversionRequestBuilder> configure, CancellationToken cancellationToken = default);
-}
-
-public class YoutubeClientWrapper : IYoutubeClient
-{
-    private readonly YoutubeClient _client = new();
-
-    public async Task DownloadAsync(string url, string outputPath, Action<ConversionRequestBuilder> configure, CancellationToken cancellationToken = default)
-    {
-        await _client.Videos.DownloadAsync(url, outputPath, configure, cancellationToken);
-    }
-}
 
 public class TrailerService : ITrailerService
 {
@@ -27,11 +9,11 @@ public class TrailerService : ITrailerService
     private readonly ILogger<TrailerService> _logger;
     private readonly IYoutubeClient _youtube;
 
-    public TrailerService(ITmdbService tmdbService, ILogger<TrailerService> logger, IYoutubeClient? youtube = null)
+    public TrailerService(ITmdbService tmdbService, ILogger<TrailerService> logger, IYoutubeClient youtube)
     {
         _tmdbService = tmdbService;
         _logger = logger;
-        _youtube = youtube ?? new YoutubeClientWrapper();
+        _youtube = youtube;
     }
 
     public async Task<bool> DownloadTrailerAsync(Movie movie, CancellationToken token = default)
@@ -59,12 +41,17 @@ public class TrailerService : ITrailerService
                 return true;
             }
 
-            await _youtube.DownloadAsync(trailerUrl, trailerPath,
-                builder => builder
-                    .SetPreset(ConversionPreset.UltraFast)
-                    .SetContainer("mp4")
-                    .SetFFmpegPath("ffmpeg"),
-                token);
+            // Ensure directory exists
+            var directory = Path.GetDirectoryName(trailerPath);
+            if (!string.IsNullOrEmpty(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            var progress = new Progress<double>(p =>
+                _logger.LogInformation("Download progress for {Title}: {Progress:P2}", movie.Title, p));
+
+            await _youtube.DownloadVideoAsync(trailerUrl, trailerPath, token);
 
             movie.TrailerPath = trailerPath;
             _logger.LogInformation("Successfully downloaded trailer for movie: {Title}", movie.Title);
@@ -79,6 +66,11 @@ public class TrailerService : ITrailerService
 
     public Task<bool> HasTrailerAsync(Movie movie)
     {
+        if (string.IsNullOrEmpty(movie.FilePath))
+        {
+            return Task.FromResult(false);
+        }
+
         var trailerPath = Path.ChangeExtension(movie.FilePath, null) + "-trailer.mp4";
         return Task.FromResult(File.Exists(trailerPath));
     }

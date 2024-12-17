@@ -1,0 +1,27 @@
+{
+  "name": "Trailarr Development",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "trailarr",
+  "workspaceFolder": "/workspace",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/dotnet:1": {
+      "version": "8.0"
+    }
+  },
+  "forwardPorts": [3000, 5000],
+  "postCreateCommand": "dotnet restore && cd src/frontend && npm install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csharp",
+        "ms-dotnettools.vscode-dotnet-runtime",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss"
+      ]
+    }
+  }
+}
