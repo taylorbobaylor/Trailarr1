@@ -49,6 +49,7 @@ namespace NzbDrone.Core.Movies
 
         public int? SecondaryYear { get; set; }
         public string YouTubeTrailerId { get; set; }
+        public string LocalTrailerPath { get; set; }
         public string Studio { get; set; }
         public string OriginalTitle { get; set; }
         public string CleanOriginalTitle { get; set; }

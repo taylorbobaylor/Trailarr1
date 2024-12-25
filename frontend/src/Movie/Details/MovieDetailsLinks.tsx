@@ -8,11 +8,11 @@ import styles from './MovieDetailsLinks.css';
 
 type MovieDetailsLinksProps = Pick<
   Movie,
-  'tmdbId' | 'imdbId' | 'youTubeTrailerId'
+  'tmdbId' | 'youTubeTrailerId' | 'localTrailerPath'
 >;
 
 function MovieDetailsLinks(props: MovieDetailsLinksProps) {
-  const { tmdbId, imdbId, youTubeTrailerId } = props;
+  const { tmdbId, youTubeTrailerId, localTrailerPath } = props;
 
   return (
     <div className={styles.links}>
@@ -29,73 +29,15 @@ function MovieDetailsLinks(props: MovieDetailsLinksProps) {
         </Label>
       </Link>
 
-      <Link
-        className={styles.link}
-        to={`https://trakt.tv/search/tmdb/${tmdbId}?id_type=movie`}
-      >
+      {localTrailerPath ? (
         <Label
           className={styles.linkLabel}
-          kind={kinds.INFO}
+          kind={kinds.SUCCESS}
           size={sizes.LARGE}
         >
-          {translate('Trakt')}
+          {translate('TrailerDownloaded')}
         </Label>
-      </Link>
-
-      <Link
-        className={styles.link}
-        to={`https://letterboxd.com/tmdb/${tmdbId}`}
-      >
-        <Label
-          className={styles.linkLabel}
-          kind={kinds.INFO}
-          size={sizes.LARGE}
-        >
-          {translate('Letterboxd')}
-        </Label>
-      </Link>
-
-      {imdbId ? (
-        <>
-          <Link
-            className={styles.link}
-            to={`https://imdb.com/title/${imdbId}/`}
-          >
-            <Label
-              className={styles.linkLabel}
-              kind={kinds.INFO}
-              size={sizes.LARGE}
-            >
-              {translate('IMDb')}
-            </Label>
-          </Link>
-
-          <Link className={styles.link} to={`https://moviechat.org/${imdbId}/`}>
-            <Label
-              className={styles.linkLabel}
-              kind={kinds.INFO}
-              size={sizes.LARGE}
-            >
-              {translate('MovieChat')}
-            </Label>
-          </Link>
-
-          <Link
-            className={styles.link}
-            to={`https://mdblist.com/movie/${imdbId}`}
-          >
-            <Label
-              className={styles.linkLabel}
-              kind={kinds.INFO}
-              size={sizes.LARGE}
-            >
-              MDBList
-            </Label>
-          </Link>
-        </>
-      ) : null}
-
-      {youTubeTrailerId ? (
+      ) : youTubeTrailerId ? (
         <Link
           className={styles.link}
           to={`https://www.youtube.com/watch?v=${youTubeTrailerId}`}

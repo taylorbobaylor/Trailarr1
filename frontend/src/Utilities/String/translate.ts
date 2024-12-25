@@ -35,7 +35,15 @@ export default function translate(
 
   const translation = translations[key] || key;
 
-  tokens.appName = 'Radarr';
+  tokens.appName = 'Trailarr';
+
+  // Add trailer-specific translations if they don't exist
+  if (!translations.TrailerDownloaded) {
+    translations.TrailerDownloaded = 'Trailer Downloaded';
+    translations.TrailerAvailable = 'Trailer Available';
+    translations.NoTrailerFound = 'No Trailer Found';
+    translations.Trailer = 'Trailer';
+  }
 
   // Fallback to the old behaviour for translations not yet updated to use named tokens
   Object.values(tokens).forEach((value, index) => {

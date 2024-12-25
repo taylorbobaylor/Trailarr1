@@ -4,7 +4,6 @@ import TextTruncate from 'react-text-truncate';
 import Alert from 'Components/Alert';
 import FieldSet from 'Components/FieldSet';
 import Icon from 'Components/Icon';
-import ImdbRating from 'Components/ImdbRating';
 import InfoLabel from 'Components/InfoLabel';
 import IconButton from 'Components/Link/IconButton';
 import Marquee from 'Components/Marquee';
@@ -16,25 +15,12 @@ import PageToolbar from 'Components/Page/Toolbar/PageToolbar';
 import PageToolbarButton from 'Components/Page/Toolbar/PageToolbarButton';
 import PageToolbarSection from 'Components/Page/Toolbar/PageToolbarSection';
 import PageToolbarSeparator from 'Components/Page/Toolbar/PageToolbarSeparator';
-import RottenTomatoRating from 'Components/RottenTomatoRating';
-import TmdbRating from 'Components/TmdbRating';
-import Popover from 'Components/Tooltip/Popover';
-import Tooltip from 'Components/Tooltip/Tooltip';
-import TraktRating from 'Components/TraktRating';
 import { icons, kinds, sizes, tooltipPositions } from 'Helpers/Props';
-import InteractiveImportModal from 'InteractiveImport/InteractiveImportModal';
 import DeleteMovieModal from 'Movie/Delete/DeleteMovieModal';
 import EditMovieModalConnector from 'Movie/Edit/EditMovieModalConnector';
 import getMovieStatusDetails from 'Movie/getMovieStatusDetails';
-import MovieHistoryModal from 'Movie/History/MovieHistoryModal';
-import MovieCollectionLabelConnector from 'Movie/MovieCollectionLabelConnector';
-import MovieGenres from 'Movie/MovieGenres';
 import MoviePoster from 'Movie/MoviePoster';
-import MovieInteractiveSearchModal from 'Movie/Search/MovieInteractiveSearchModal';
-import MovieFileEditorTable from 'MovieFile/Editor/MovieFileEditorTable';
-import ExtraFileTable from 'MovieFile/Extras/ExtraFileTable';
-import OrganizePreviewModalConnector from 'Organize/OrganizePreviewModalConnector';
-import QualityProfileNameConnector from 'Settings/Profiles/Quality/QualityProfileNameConnector';
+import Label from 'Components/Label';
 import fonts from 'Styles/Variables/fonts';
 import * as keyCodes from 'Utilities/Constants/keyCodes';
 import formatRuntime from 'Utilities/Date/formatRuntime';
@@ -66,12 +52,6 @@ class MovieDetails extends Component {
     super(props, context);
 
     this.state = {
-      isOrganizeModalOpen: false,
-      isEditMovieModalOpen: false,
-      isDeleteMovieModalOpen: false,
-      isInteractiveImportModalOpen: false,
-      isInteractiveSearchModalOpen: false,
-      isMovieHistoryModalOpen: false,
       overviewHeight: 0,
       titleWidth: 0
     };
@@ -96,36 +76,12 @@ class MovieDetails extends Component {
   //
   // Listeners
 
-  onOrganizePress = () => {
-    this.setState({ isOrganizeModalOpen: true });
-  };
-
-  onOrganizeModalClose = () => {
-    this.setState({ isOrganizeModalOpen: false });
-  };
-
-  onInteractiveImportPress = () => {
-    this.setState({ isInteractiveImportModalOpen: true });
-  };
-
-  onInteractiveImportModalClose = () => {
-    this.setState({ isInteractiveImportModalOpen: false });
-  };
-
   onEditMoviePress = () => {
     this.setState({ isEditMovieModalOpen: true });
   };
 
   onEditMovieModalClose = () => {
     this.setState({ isEditMovieModalOpen: false });
-  };
-
-  onInteractiveSearchPress = () => {
-    this.setState({ isInteractiveSearchModalOpen: true });
-  };
-
-  onInteractiveSearchModalClose = () => {
-    this.setState({ isInteractiveSearchModalOpen: false });
   };
 
   onDeleteMoviePress = () => {
@@ -137,14 +93,6 @@ class MovieDetails extends Component {
 
   onDeleteMovieModalClose = () => {
     this.setState({ isDeleteMovieModalOpen: false });
-  };
-
-  onMovieHistoryPress = () => {
-    this.setState({ isMovieHistoryModalOpen: true });
-  };
-
-  onMovieHistoryModalClose = () => {
-    this.setState({ isMovieHistoryModalOpen: false });
   };
 
   onMeasure = ({ height }) => {
@@ -305,43 +253,6 @@ class MovieDetails extends Component {
               title={translate('RefreshInformationAndScanDisk')}
               isSpinning={isRefreshing}
               onPress={onRefreshPress}
-            />
-
-            <PageToolbarButton
-              label={translate('SearchMovie')}
-              iconName={icons.SEARCH}
-              isSpinning={isSearching}
-              title={undefined}
-              onPress={onSearchPress}
-            />
-
-            <PageToolbarButton
-              label={translate('InteractiveSearch')}
-              iconName={icons.INTERACTIVE}
-              isSpinning={isSearching}
-              title={undefined}
-              onPress={this.onInteractiveSearchPress}
-            />
-
-            <PageToolbarSeparator />
-
-            <PageToolbarButton
-              label={translate('PreviewRename')}
-              iconName={icons.ORGANIZE}
-              isDisabled={!hasMovieFiles}
-              onPress={this.onOrganizePress}
-            />
-
-            <PageToolbarButton
-              label={translate('ManageFiles')}
-              iconName={icons.MOVIE_FILE}
-              onPress={this.onInteractiveImportPress}
-            />
-
-            <PageToolbarButton
-              label={translate('History')}
-              iconName={icons.HISTORY}
-              onPress={this.onMovieHistoryPress}
             />
 
             <PageToolbarSeparator />
@@ -505,48 +416,7 @@ class MovieDetails extends Component {
                   </div>
                 </div>
 
-                <div className={styles.details}>
-                  {
-                    ratings.tmdb ?
-                      <span className={styles.rating}>
-                        <TmdbRating
-                          ratings={ratings}
-                          iconSize={20}
-                        />
-                      </span> :
-                      null
-                  }
-                  {
-                    ratings.imdb ?
-                      <span className={styles.rating}>
-                        <ImdbRating
-                          ratings={ratings}
-                          iconSize={20}
-                        />
-                      </span> :
-                      null
-                  }
-                  {
-                    ratings.rottenTomatoes ?
-                      <span className={styles.rating}>
-                        <RottenTomatoRating
-                          ratings={ratings}
-                          iconSize={20}
-                        />
-                      </span> :
-                      null
-                  }
-                  {
-                    ratings.trakt ?
-                      <span className={styles.rating}>
-                        <TraktRating
-                          ratings={ratings}
-                          iconSize={20}
-                        />
-                      </span> :
-                      null
-                  }
-                </div>
+                <div className={styles.details}></div>
 
                 <div className={styles.detailsLabels}>
                   <InfoLabel
@@ -558,104 +428,6 @@ class MovieDetails extends Component {
                       {path}
                     </span>
                   </InfoLabel>
-
-                  <InfoLabel
-                    className={styles.detailsInfoLabel}
-                    name={translate('Status')}
-                    title={statusDetails.message}
-                    kind={kinds.DELETE}
-                    size={sizes.LARGE}
-                  >
-                    <span className={styles.statusName}>
-                      <MovieStatusLabel
-                        status={status}
-                        hasMovieFiles={hasMovieFiles}
-                        monitored={monitored}
-                        isAvailable={isAvailable}
-                        queueItem={queueItem}
-                      />
-                    </span>
-                  </InfoLabel>
-
-                  <InfoLabel
-                    className={styles.detailsInfoLabel}
-                    name={translate('QualityProfile')}
-                    size={sizes.LARGE}
-                  >
-                    <span className={styles.qualityProfileName}>
-                      {
-                        <QualityProfileNameConnector
-                          qualityProfileId={qualityProfileId}
-                        />
-                      }
-                    </span>
-                  </InfoLabel>
-
-                  <InfoLabel
-                    className={styles.detailsInfoLabel}
-                    name={translate('Size')}
-                    size={sizes.LARGE}
-                  >
-                    <span className={styles.sizeOnDisk}>
-                      {formatBytes(sizeOnDisk)}
-                    </span>
-                  </InfoLabel>
-
-                  {
-                    collection ?
-                      <InfoLabel
-                        className={styles.detailsInfoLabel}
-                        name={translate('Collection')}
-                        size={sizes.LARGE}
-                      >
-                        <div className={styles.collection}>
-                          <MovieCollectionLabelConnector
-                            tmdbId={collection.tmdbId}
-                          />
-                        </div>
-                      </InfoLabel> :
-                      null
-                  }
-
-                  {
-                    originalLanguage?.name && !isSmallScreen ?
-                      <InfoLabel
-                        className={styles.detailsInfoLabel}
-                        name={translate('OriginalLanguage')}
-                        size={sizes.LARGE}
-                      >
-                        <span className={styles.originalLanguage}>
-                          {originalLanguage.name}
-                        </span>
-                      </InfoLabel> :
-                      null
-                  }
-
-                  {
-                    studio && !isSmallScreen ?
-                      <InfoLabel
-                        className={styles.detailsInfoLabel}
-                        name={translate('Studio')}
-                        size={sizes.LARGE}
-                      >
-                        <span className={styles.studio}>
-                          {studio}
-                        </span>
-                      </InfoLabel> :
-                      null
-                  }
-
-                  {
-                    genres.length && !isSmallScreen ?
-                      <InfoLabel
-                        className={styles.detailsInfoLabel}
-                        name={translate('Genres')}
-                        size={sizes.LARGE}
-                      >
-                        <MovieGenres className={styles.genres} genres={genres} />
-                      </InfoLabel> :
-                      null
-                  }
                 </div>
 
                 <Measure onMeasure={this.onMeasure}>
@@ -695,40 +467,24 @@ class MovieDetails extends Component {
                 null
             }
 
-            <FieldSet legend={translate('Files')}>
-              <MovieFileEditorTable
-                movieId={id}
-              />
-
-              <ExtraFileTable
-                movieId={id}
-              />
-            </FieldSet>
-
-            <FieldSet legend={translate('Cast')}>
-              <MovieCastPosters
-                isSmallScreen={isSmallScreen}
-              />
-            </FieldSet>
-
-            <FieldSet legend={translate('Crew')}>
-              <MovieCrewPosters
-                isSmallScreen={isSmallScreen}
-              />
-            </FieldSet>
-
-            <FieldSet legend={translate('Titles')}>
-              <MovieTitlesTable
-                movieId={id}
-              />
+            <FieldSet legend={translate('Trailer')}>
+              <div className={styles.trailerStatus}>
+                {localTrailerPath ? (
+                  <Label kind={kinds.SUCCESS}>
+                    {translate('TrailerDownloaded')}
+                  </Label>
+                ) : youTubeTrailerId ? (
+                  <Label kind={kinds.WARNING}>
+                    {translate('TrailerAvailable')}
+                  </Label>
+                ) : (
+                  <Label kind={kinds.DANGER}>
+                    {translate('NoTrailerFound')}
+                  </Label>
+                )}
+              </div>
             </FieldSet>
           </div>
-
-          <OrganizePreviewModalConnector
-            isOpen={isOrganizeModalOpen}
-            movieId={id}
-            onModalClose={this.onOrganizeModalClose}
-          />
 
           <EditMovieModalConnector
             isOpen={isEditMovieModalOpen}
@@ -737,35 +493,11 @@ class MovieDetails extends Component {
             onDeleteMoviePress={this.onDeleteMoviePress}
           />
 
-          <MovieHistoryModal
-            isOpen={isMovieHistoryModalOpen}
-            movieId={id}
-            onModalClose={this.onMovieHistoryModalClose}
-          />
-
           <DeleteMovieModal
             isOpen={isDeleteMovieModalOpen}
             movieId={id}
             onModalClose={this.onDeleteMovieModalClose}
             nextMovieRelativePath={`/movie/${nextMovie.titleSlug}`}
-          />
-
-          <InteractiveImportModal
-            isOpen={isInteractiveImportModalOpen}
-            movieId={id}
-            modalTitle={translate('ManageFiles')}
-            folder={path}
-            allowMovieChange={false}
-            showFilterExistingFiles={true}
-            showImportMode={false}
-            onModalClose={this.onInteractiveImportModalClose}
-          />
-
-          <MovieInteractiveSearchModal
-            isOpen={isInteractiveSearchModalOpen}
-            movieId={id}
-            movieTitle={title}
-            onModalClose={this.onInteractiveSearchModalClose}
           />
         </PageContentBody>
       </PageContent>
@@ -775,27 +507,13 @@ class MovieDetails extends Component {
 
 MovieDetails.propTypes = {
   id: PropTypes.number.isRequired,
-  tmdbId: PropTypes.number.isRequired,
-  imdbId: PropTypes.string,
   title: PropTypes.string.isRequired,
   originalTitle: PropTypes.string,
   year: PropTypes.number.isRequired,
-  runtime: PropTypes.number.isRequired,
-  certification: PropTypes.string,
-  ratings: PropTypes.object.isRequired,
   path: PropTypes.string.isRequired,
-  statistics: PropTypes.object.isRequired,
-  qualityProfileId: PropTypes.number.isRequired,
   monitored: PropTypes.bool.isRequired,
-  status: PropTypes.string.isRequired,
-  studio: PropTypes.string,
-  originalLanguage: PropTypes.object,
-  genres: PropTypes.arrayOf(PropTypes.string).isRequired,
-  collection: PropTypes.object,
   youTubeTrailerId: PropTypes.string,
-  isAvailable: PropTypes.bool.isRequired,
-  inCinemas: PropTypes.string,
-  physicalRelease: PropTypes.string,
+  localTrailerPath: PropTypes.string,
   digitalRelease: PropTypes.string,
   overview: PropTypes.string.isRequired,
   images: PropTypes.arrayOf(PropTypes.object).isRequired,
@@ -808,9 +526,7 @@ MovieDetails.propTypes = {
   isPopulated: PropTypes.bool.isRequired,
   isSmallScreen: PropTypes.bool.isRequired,
   isSidebarVisible: PropTypes.bool.isRequired,
-  movieFilesError: PropTypes.object,
-  movieCreditsError: PropTypes.object,
-  extraFilesError: PropTypes.object,
+  localTrailerPath: PropTypes.string,
   hasMovieFiles: PropTypes.bool.isRequired,
   previousMovie: PropTypes.object.isRequired,
   nextMovie: PropTypes.object.isRequired,

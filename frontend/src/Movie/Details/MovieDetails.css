@@ -171,6 +171,19 @@
   padding: 20px;
 }
 
+.trailerStatus {
+  margin: 10px 0;
+  padding: 15px;
+  border-radius: 4px;
+  background-color: var(--gray);
+  text-align: center;
+}
+
+.trailerStatus label {
+  font-size: 16px;
+  font-weight: 500;
+}
+
 .tabList {
   margin: 0;
   padding: 0;
