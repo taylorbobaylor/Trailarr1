@@ -17,6 +17,8 @@ namespace NzbDrone.Core.Configuration
         bool AutoUnmonitorPreviouslyDownloadedMovies { get; set; }
         string RecycleBin { get; set; }
         int RecycleBinCleanupDays { get; set; }
+        bool AutoDownloadTrailer { get; set; }
+        string TrailerFolder { get; set; }
         ProperDownloadTypes DownloadPropersAndRepacks { get; set; }
         bool CreateEmptyMovieFolders { get; set; }
         bool DeleteEmptyFolders { get; set; }

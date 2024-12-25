@@ -97,6 +97,12 @@ namespace NzbDrone.Core.Configuration
             set { SetValue("RecycleBin", value); }
         }
 
+        public string TrailerFolder
+        {
+            get { return GetValue("TrailerFolder", string.Empty); }
+            set { SetValue("TrailerFolder", value); }
+        }
+
         public int RecycleBinCleanupDays
         {
             get { return GetValueInt("RecycleBinCleanupDays", 7); }
