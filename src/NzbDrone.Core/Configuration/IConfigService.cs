@@ -13,17 +13,6 @@ namespace NzbDrone.Core.Configuration
 
         bool IsDefined(string key);
 
-        // Download Client
-        string DownloadClientWorkingFolders { get; set; }
-        int DownloadClientHistoryLimit { get; set; }
-        int CheckForFinishedDownloadInterval { get; set; }
-
-        // Completed/Failed Download Handling (Download client)
-        bool EnableCompletedDownloadHandling { get; set; }
-
-        bool AutoRedownloadFailed { get; set; }
-        bool AutoRedownloadFailedFromInteractiveSearch { get; set; }
-
         // Media Management
         bool AutoUnmonitorPreviouslyDownloadedMovies { get; set; }
         string RecycleBin { get; set; }

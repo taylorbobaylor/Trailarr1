@@ -15,12 +15,10 @@ namespace Radarr.Api.V3.Profiles.Release
     public class ReleaseProfileController : RestController<ReleaseProfileResource>
     {
         private readonly IReleaseProfileService _profileService;
-        private readonly IIndexerFactory _indexerFactory;
 
-        public ReleaseProfileController(IReleaseProfileService profileService, IIndexerFactory indexerFactory)
+        public ReleaseProfileController(IReleaseProfileService profileService)
         {
             _profileService = profileService;
-            _indexerFactory = indexerFactory;
 
             SharedValidator.RuleFor(d => d).Custom((restriction, context) =>
             {
@@ -37,11 +35,6 @@ namespace Radarr.Api.V3.Profiles.Release
                 if (restriction.MapIgnored().Any(t => t.IsNullOrWhiteSpace()))
                 {
                     context.AddFailure(nameof(ReleaseProfile.Ignored), "'Must not contain' should not contain whitespaces or an empty string");
-                }
-
-                if (restriction.Enabled && restriction.IndexerId != 0 && !_indexerFactory.Exists(restriction.IndexerId))
-                {
-                    context.AddFailure(nameof(ReleaseProfile.IndexerId), "Indexer does not exist");
                 }
             });
         }

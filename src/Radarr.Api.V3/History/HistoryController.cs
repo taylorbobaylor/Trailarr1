@@ -22,19 +22,16 @@ namespace Radarr.Api.V3.History
         private readonly IMovieService _movieService;
         private readonly ICustomFormatCalculationService _formatCalculator;
         private readonly IUpgradableSpecification _upgradableSpecification;
-        private readonly IFailedDownloadService _failedDownloadService;
 
         public HistoryController(IHistoryService historyService,
                              IMovieService movieService,
                              ICustomFormatCalculationService formatCalculator,
-                             IUpgradableSpecification upgradableSpecification,
-                             IFailedDownloadService failedDownloadService)
+                             IUpgradableSpecification upgradableSpecification)
         {
             _historyService = historyService;
             _movieService = movieService;
             _formatCalculator = formatCalculator;
             _upgradableSpecification = upgradableSpecification;
-            _failedDownloadService = failedDownloadService;
         }
 
         protected HistoryResource MapToResource(MovieHistory model, bool includeMovie)
@@ -107,11 +104,6 @@ namespace Radarr.Api.V3.History
             return _historyService.GetByMovieId(movieId, eventType).Select(h => MapToResource(h, includeMovie)).ToList();
         }
 
-        [HttpPost("failed/{id}")]
-        public object MarkAsFailed([FromRoute] int id)
-        {
-            _failedDownloadService.MarkAsFailed(id);
-            return new { };
-        }
+        // Trailer history only - no failed downloads
     }
 }

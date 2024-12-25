@@ -25,38 +25,18 @@ namespace Radarr.Api.V3.Queue
 {
     [V3ApiController]
     public class QueueController : RestControllerWithSignalR<QueueResource, NzbDrone.Core.Queue.Queue>,
-                               IHandle<QueueUpdatedEvent>, IHandle<PendingReleasesUpdatedEvent>
+                               IHandle<QueueUpdatedEvent>
     {
         private readonly IQueueService _queueService;
-        private readonly IPendingReleaseService _pendingReleaseService;
-
-        private readonly QualityModelComparer _qualityComparer;
-        private readonly ITrackedDownloadService _trackedDownloadService;
-        private readonly IFailedDownloadService _failedDownloadService;
-        private readonly IIgnoredDownloadService _ignoredDownloadService;
-        private readonly IProvideDownloadClient _downloadClientProvider;
-        private readonly IBlocklistService _blocklistService;
+        private readonly ITrailerService _trailerService;
 
         public QueueController(IBroadcastSignalRMessage broadcastSignalRMessage,
                            IQueueService queueService,
-                           IPendingReleaseService pendingReleaseService,
-                           QualityProfileService qualityProfileService,
-                           ITrackedDownloadService trackedDownloadService,
-                           IFailedDownloadService failedDownloadService,
-                           IIgnoredDownloadService ignoredDownloadService,
-                           IProvideDownloadClient downloadClientProvider,
-                           IBlocklistService blocklistService)
+                           ITrailerService trailerService)
             : base(broadcastSignalRMessage)
         {
             _queueService = queueService;
-            _pendingReleaseService = pendingReleaseService;
-            _trackedDownloadService = trackedDownloadService;
-            _failedDownloadService = failedDownloadService;
-            _ignoredDownloadService = ignoredDownloadService;
-            _downloadClientProvider = downloadClientProvider;
-            _blocklistService = blocklistService;
-
-            _qualityComparer = new QualityModelComparer(qualityProfileService.GetDefaultProfile(string.Empty));
+            _trailerService = trailerService;
         }
 
         [NonAction]
@@ -71,26 +51,15 @@ namespace Radarr.Api.V3.Queue
         }
 
         [RestDeleteById]
-        public void RemoveAction(int id, bool removeFromClient = true, bool blocklist = false, bool skipRedownload = false, bool changeCategory = false)
+        public void RemoveAction(int id)
         {
-            var pendingRelease = _pendingReleaseService.FindPendingQueueItem(id);
-
-            if (pendingRelease != null)
-            {
-                Remove(pendingRelease, blocklist);
-
-                return;
-            }
-
-            var trackedDownload = GetTrackedDownload(id);
-
-            if (trackedDownload == null)
+            var queueItem = _queueService.Get(id);
+            if (queueItem == null)
             {
                 throw new NotFoundException();
             }
 
-            Remove(trackedDownload, removeFromClient, blocklist, skipRedownload, changeCategory);
-            _trackedDownloadService.StopTracking(trackedDownload.DownloadItem.DownloadId);
+            _queueService.Remove(id);
         }
 
         [HttpDelete("bulk")]
