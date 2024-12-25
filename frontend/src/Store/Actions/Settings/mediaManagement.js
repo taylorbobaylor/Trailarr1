@@ -43,7 +43,10 @@ export default {
     pendingChanges: {},
     isSaving: false,
     saveError: null,
-    item: {}
+    item: {
+      autoDownloadTrailer: false,
+      trailerFolder: ''
+    }
   },
 
   //

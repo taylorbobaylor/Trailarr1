@@ -85,10 +85,10 @@ namespace NzbDrone.Core.Configuration
             set { SetValue("AutoUnmonitorPreviouslyDownloadedMovies", value); }
         }
 
-        public bool AutoDownloadTrailers
+        public bool AutoDownloadTrailer
         {
-            get { return GetValueBoolean("AutoDownloadTrailers", false); }
-            set { SetValue("AutoDownloadTrailers", value); }
+            get { return GetValueBoolean("AutoDownloadTrailer", false); }
+            set { SetValue("AutoDownloadTrailer", value); }
         }
 
         public string RecycleBin
