@@ -1,0 +1,22 @@
+{
+  "movies": [
+    {
+      "title": "The Matrix",
+      "year": 1999,
+      "tmdbId": 603,
+      "path": "/movies/The.Matrix.1999"
+    },
+    {
+      "title": "Inception",
+      "year": 2010,
+      "tmdbId": 27205,
+      "path": "/movies/Inception.2010"
+    },
+    {
+      "title": "Avatar",
+      "year": 2009,
+      "tmdbId": 19995,
+      "path": "/movies/Avatar.2009"
+    }
+  ]
+}

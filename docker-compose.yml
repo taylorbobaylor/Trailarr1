@@ -1,0 +1,19 @@
+version: "3.7"
+services:
+  trailarr:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "6767:8080"
+    volumes:
+      - ./test/movies:/movies
+      - ./test/trailers:/trailers
+      - ./config:/config
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+      - AUTO_DOWNLOAD_TRAILERS=true
+      - TRAILER_FOLDER=/trailers
+    restart: unless-stopped
