@@ -12,6 +12,9 @@ using NzbDrone.Core.Messaging.Events;
 using NzbDrone.Core.Movies.Events;
 using NzbDrone.Core.Parser;
 using NzbDrone.Core.Parser.RomanNumerals;
+using NzbDrone.Core.Trailers;
+using System.Threading.Tasks;
+using System.IO;
 
 namespace NzbDrone.Core.Movies
 {
@@ -59,6 +62,7 @@ namespace NzbDrone.Core.Movies
         private readonly IEventAggregator _eventAggregator;
         private readonly IBuildMoviePaths _moviePathBuilder;
         private readonly IAutoTaggingService _autoTaggingService;
+        private readonly ITrailerDownloadService _trailerDownloadService;
         private readonly Logger _logger;
 
         public MovieService(IMovieRepository movieRepository,
@@ -66,6 +70,7 @@ namespace NzbDrone.Core.Movies
                             IConfigService configService,
                             IBuildMoviePaths moviePathBuilder,
                             IAutoTaggingService autoTaggingService,
+                            ITrailerDownloadService trailerDownloadService,
                             Logger logger)
         {
             _movieRepository = movieRepository;
@@ -73,6 +78,7 @@ namespace NzbDrone.Core.Movies
             _configService = configService;
             _moviePathBuilder = moviePathBuilder;
             _autoTaggingService = autoTaggingService;
+            _trailerDownloadService = trailerDownloadService;
             _logger = logger;
         }
 
@@ -95,6 +101,33 @@ namespace NzbDrone.Core.Movies
         {
             var movie = _movieRepository.Insert(newMovie);
 
+            if (_configService.AutoDownloadTrailer)
+            {
+                var trailerFolder = _configService.TrailerFolder;
+                if (!string.IsNullOrWhiteSpace(trailerFolder))
+                {
+                    Directory.CreateDirectory(trailerFolder);
+                    var outputPath = Path.Combine(trailerFolder, $"{movie.Title}-trailer.mp4");
+                    
+                    Task.Run(async () =>
+                    {
+                        try
+                        {
+                            var trailerId = await _trailerDownloadService.GetBestTrailerUrlAsync(movie.Title);
+                            if (!string.IsNullOrEmpty(trailerId))
+                            {
+                                await _trailerDownloadService.DownloadTrailerAsync(movie.Title, trailerId, outputPath);
+                                _logger.Info("Downloaded trailer for movie: {0}", movie.Title);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error(ex, "Failed to download trailer for movie: {0}", movie.Title);
+                        }
+                    });
+                }
+            }
+
             _eventAggregator.PublishEvent(new MovieAddedEvent(GetMovie(movie.Id)));
 
             return movie;
@@ -103,6 +136,37 @@ namespace NzbDrone.Core.Movies
         public List<Movie> AddMovies(List<Movie> newMovies)
         {
             _movieRepository.InsertMany(newMovies);
+
+            if (_configService.AutoDownloadTrailer)
+            {
+                var trailerFolder = _configService.TrailerFolder;
+                if (!string.IsNullOrWhiteSpace(trailerFolder))
+                {
+                    Directory.CreateDirectory(trailerFolder);
+                    
+                    foreach (var movie in newMovies)
+                    {
+                        var outputPath = Path.Combine(trailerFolder, $"{movie.Title}-trailer.mp4");
+                        
+                        Task.Run(async () =>
+                        {
+                            try
+                            {
+                                var trailerId = await _trailerDownloadService.GetBestTrailerUrlAsync(movie.Title);
+                                if (!string.IsNullOrEmpty(trailerId))
+                                {
+                                    await _trailerDownloadService.DownloadTrailerAsync(movie.Title, trailerId, outputPath);
+                                    _logger.Info("Downloaded trailer for movie: {0}", movie.Title);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.Error(ex, "Failed to download trailer for movie: {0}", movie.Title);
+                            }
+                        });
+                    }
+                }
+            }
 
             _eventAggregator.PublishEvent(new MoviesImportedEvent(newMovies));
 
